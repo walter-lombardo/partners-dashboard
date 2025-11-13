@@ -1,0 +1,129 @@
+Title: Update dKit Partners Dashboard to Yellow + iOS 17 Translucent Style
+
+What to change
+
+Accent color → Yellow
+
+Replace purple tokens with yellow:
+
+brand.accent → #FFE224 (primary yellow)
+
+brand.accentSoft → #FFF3A3 (soft glow / gradient stop)
+
+Keep the dark backgrounds the same as current (from dkit.xyz styling). 
+DoritoKit
+
+Update focus/selection rings to use yellow with 24% opacity.
+
+Translucent (iOS 17) components
+
+Cards, navbar, KPI tiles, chart panel, tables should use frosted glass:
+
+Background: rgba(255,255,255,0.06) (dark theme) on top of existing dark gradient.
+
+Backdrop blur: backdrop-filter: blur(18px); (fall back gracefully if unsupported).
+
+Border: 1px solid rgba(255,255,255,0.12) with inner hairline: inset 0 1px 0 rgba(255,255,255,0.08).
+
+Shadow (glow option): 0 8px 30px rgba(0,0,0,0.35), 0 0 0 3px rgba(255,226,36,0.12) on primary tiles.
+
+Use material layering (depth scale):
+
+Surface/0 (page): existing dark gradient.
+
+Surface/1 (cards): rgba 0.06 + blur(12px).
+
+Surface/2 (highlight tiles, modals): rgba 0.10 + blur(18px) + glow.
+
+Tooltips/menus: rgba 0.12 + blur(20px) + border rgba 0.18.
+
+Typography & iconography
+
+Keep Inter; enable font-feature-settings: "tnum" for tabular figures in KPIs.
+
+Icon strokes adopt brand.accent on hover/active.
+
+Components to refit
+
+KPI cards (Total Volume, Affiliate Fees):
+
+Big numbers with subtle gradient text: linear-gradient(90deg, #FFE224, #FFF3A3) clipped to text.
+
+“Eye” button uses translucent button style: background rgba(255,255,255,0.06), border rgba(255,255,255,0.12), hover rgba(255,255,255,0.10).
+
+Chart panel:
+
+Area/line stroke uses #FFE224; fill uses linear-gradient(180deg, rgba(255,226,36,0.32), rgba(255,226,36,0.00)).
+
+Active range pill (1D/7D/1M/3M/All) uses translucent yellow ring.
+
+Latest Transactions:
+
+Row background on hover: rgba(255,255,255,0.06); separators: rgba(255,255,255,0.08).
+
+Status dots: success #17C964, danger #F31260.
+
+Buttons:
+
+Primary: text #0B0D12, bg #FFE224, hover #F2D91F, focus ring rgba(255,226,36,0.35).
+
+Ghost/translucent: rgba(255,255,255,0.06) + border rgba(255,255,255,0.12); on hover raise alpha by +0.04.
+
+Inputs:
+
+Background rgba(255,255,255,0.04), border rgba(255,255,255,0.12), focus ring rgba(255,226,36,0.35); placeholder #9AA3B2.
+
+Token map (Tailwind or CSS variables)
+
+Keep existing dark tokens; add/replace:
+
+--accent: #FFE224;
+
+--accent-soft: #FFF3A3;
+
+--glass-bg: rgba(255,255,255,0.06);
+
+--glass-bg-strong: rgba(255,255,255,0.10);
+
+--glass-border: rgba(255,255,255,0.12);
+
+--glass-inner: rgba(255,255,255,0.08);
+
+--ring-accent: rgba(255,226,36,0.35);
+
+Create utility classes:
+
+.glass → background var(--glass-bg), backdrop-blur(18px), border var(--glass-border), inner shadow.
+
+.glass-strong → bg var(--glass-bg-strong), blur(20px).
+
+.ring-accent → outline + drop-shadow using --ring-accent.
+
+Micro-interactions
+
+Subtle scale/raise (1.015) on KPI hover.
+
+Smooth transitions (180ms) for bg, border, shadow, transform.
+
+Chart tooltip uses glass panel with masked shadow and accent chip.
+
+Accessibility
+
+Ensure contrast ≥ 4.5:1 for text over glass surfaces (raise alpha if needed).
+
+Focus visible on all interactive elements using yellow ring.
+
+Deliverables
+
+Updated theme tokens (no logo changes).
+
+Reworked components (KPI, Chart panel, Table rows, Buttons, Inputs) using glass utilities.
+
+Visual parity with current layout, but yellow accented and translucent like iOS 17.
+
+No backend changes; mock API remains.
+
+Reference
+
+Keep layout/spacing consistent with dKit site’s dark aesthetic (only accent & material updated). 
+DoritoKit

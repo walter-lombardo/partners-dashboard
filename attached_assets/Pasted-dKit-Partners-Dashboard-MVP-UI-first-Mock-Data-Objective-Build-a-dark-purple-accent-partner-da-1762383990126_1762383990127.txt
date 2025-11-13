@@ -1,0 +1,295 @@
+dKit Partners Dashboard (MVP, UI-first, Mock Data)
+
+Objective
+Build a dark, purple-accent partner dashboard where projects (affiliates) can:
+
+Sign up with email + password
+
+Submit project details, Bitcoin payout address, and tracking IDs (THORName, MayaName, Chainflip address)
+
+See a Dashboard with KPIs, a time-series chart, and Latest Transactions (mocked now; wire real indexers later)
+
+Important
+
+Follow the aesthetic of the attached screenshot exactly (sidebar left, top KPIs, purple line chart, cards, latest transactions table).
+
+Do not include any logos—the user will upload them later.
+
+UI/UX must be production-polished, but backend is mock (in-memory) for this MVP.
+
+Stack & Project Layout
+
+Framework: Next.js 14 (App Router) + TypeScript
+
+Styling: Tailwind CSS (dark theme), minimal custom CSS variables for gradients
+
+UI: shadcn/ui components (Cards, Buttons, Inputs, Tabs, Select, Tooltip)
+
+Forms: React Hook Form + Zod (client validation only)
+
+Charts: Recharts (single area/line series with gradient fill)
+
+API: Next Route Handlers returning mock JSON (no database)
+
+Auth (MVP): simple email+password with in-memory store; protect /dashboard, /wallet, /settings via “isLoggedIn” flag
+
+File tree (exact paths)
+
+/app
+  /api
+    me/route.ts          (mock user+project response)
+    metrics/route.ts     (mock time-series + totals)
+    transactions/route.ts (mock latest txs)
+  /dashboard/page.tsx
+  /login/page.tsx
+  /onboarding/page.tsx
+  /wallet/page.tsx
+  /settings/page.tsx
+  /support/page.tsx
+  layout.tsx
+  globals.css
+/components
+  AddressBadge.tsx
+  KpiCard.tsx
+  TimeRangeTabs.tsx
+  MetricToggle.tsx
+  TimeSeriesChart.tsx
+  TransactionsTable.tsx
+  Wizard.tsx
+  FormField.tsx
+/lib
+  mockStore.ts
+  validation.ts
+  ui.ts
+public
+  (empty; logos will be added later)
+/styles
+  shadcn.css
+package.json, tsconfig, tailwind.config, postcss.config
+
+Branding & Visuals (match screenshot)
+
+Background: deep charcoal gradient (top darker → bottom slightly lighter).
+
+Surfaces: card panels with soft radii and subtle inner shadow.
+
+Accent: bright purple for chart stroke, highlights, active nav pill.
+
+Text: off-white for primary, cool gray for secondary.
+
+State Icons: small green/red up/down chevrons next to % changes.
+
+Sidebar: left vertical nav with icons & labels, active item highlighted (pill).
+
+Header: page title “dKiT Partners Dashboard” (exact spelling) aligned to the left.
+
+Top KPIs: two big numbers (“Total Volume” and “Affiliate Fees Earned”), each with tiny secondary line “~ 13.4578 BTC” style. Include an “eye”/“hide” icon placeholder next to each amount.
+
+Use the attached screenshot for spacing, paddings, typography size hierarchy, and component placement.
+
+Navigation & Pages
+Sidebar items (top→bottom)
+
+Dashboard (active on load after onboarding)
+
+Wallet
+
+Settings
+
+Support
+
+Routes
+
+/login
+
+Email, Password, “Sign in”
+
+Link: “New here? Create an account” → /onboarding
+
+/onboarding (3-step wizard)
+
+Step 1 – Basics: Project Name, Project Logo (file picker UI only), dApp link (https://…)
+
+Step 2 – Payouts: Bitcoin address for payouts
+
+Helper text: “Affiliate payouts are sent to your Bitcoin address. Use a wallet you control; on-chain payments are final.”
+
+Step 3 – Tracking IDs: THORName, MayaName, Chainflip address
+
+Helper text: “We attribute swaps and fees to your project using these IDs.”
+
+Buttons: Back / Continue; Finish leads to /dashboard
+
+/dashboard
+
+Top KPIs:
+
+Total Volume (USD) — large numeric
+
+Affiliate Fees Earned (USD) — large numeric
+
+Below each, a tiny “~ 13.4578 BTC” style subline (mock conversion)
+
+Chart block:
+
+Title: “Market Overview”
+
+Toggle Metric: [Fees | Volume] (default Fees)
+
+Range tabs: 1D, 7D, 1M, 3M, All (default 1D or 7D; choose whichever matches screenshot best)
+
+Tooltip with value + small green/red delta badge
+
+Latest Transactions card/table:
+
+Columns: Asset/Route, Time, Amount (+0.431 BTC style), USD notional (subtext), Status (Completed/Terminated with green/red dot)
+
+Four example rows to mirror screenshot proportions
+
+/wallet
+
+Single form: Bitcoin address for payouts
+
+Buttons: Save / Copy Address / Reveal masked address
+
+/settings
+
+Project: Name, Logo placeholder, dApp link
+
+Tracking IDs: THORName, MayaName, Chainflip address
+
+Save button; inline validation messages
+
+/support
+
+Short FAQ + “Contact support” mailto link (placeholder)
+
+Form Fields, Labels & Validation
+
+Exact labels
+
+Project Name
+
+Project Logo
+
+dApp link
+
+Bitcoin address for payouts
+
+THORName
+
+MayaName
+
+Chainflip address
+
+Validation (client-side, show inline error text)
+
+dApp link must start with https://
+
+Bitcoin address: allow 1…, 3…, or bc1… (basic length/pattern check; no heavy checksum now)
+
+THORName / MayaName: lowercase letters, digits, and dashes only, 1–32 chars
+
+Chainflip address: freeform for MVP (non-empty optional)
+
+Masking
+
+When displaying stored BTC address, show prefix…suffix with a Reveal button and a Copy button.
+
+Data Model (MVP in-memory)
+
+User: { id, email, role: "PARTNER", projectId }
+
+Project: { id, name, logoUrl?, dappUrl, btcAddress?, thorName?, mayaName?, chainflipAddress? }
+
+MetricPoint: { t: ISODate, volumeUsd: number, feesUsd: number, trades: number }
+
+Transaction: { ts: ISODate, route: "BTC→ETH" | "ETH→USDC" | etc, usdNotional: number, feeUsd: number, status: "Completed"|"Terminated", txHash: string, chain: "THOR"|"MAYA"|"CHAINFLIP" }
+
+Seed 30 days of points with mild randomness and 4–8 recent transactions so the UI looks alive.
+
+Mock API Contract (must match exactly)
+
+GET /api/me →
+
+{
+  "user": { "id": "u1", "email": "partner@demo.app", "role": "PARTNER", "projectId": "p1" },
+  "project": {
+    "id": "p1",
+    "name": "Your Project",
+    "logoUrl": null,
+    "dappUrl": "https://example.app",
+    "btcAddress": "bc1qexample...",
+    "thorName": "your-thorname",
+    "mayaName": "your-mayaname",
+    "chainflipAddress": "0xabc...def"
+  }
+}
+
+
+GET /api/metrics?from=&to=&granularity=day →
+
+{
+  "series": [
+    { "t": "2025-10-10", "volumeUsd": 12450.12, "feesUsd": 86.44, "trades": 32 }
+  ],
+  "totals": {
+    "volumeUsd": 345045.31,
+    "feesUsd": 3450.45,
+    "trades": 981,
+    "change24h": 0.023,
+    "btcEquivalent": 13.4578
+  }
+}
+
+
+GET /api/transactions?limit=25 →
+
+[
+  { "ts": "2025-10-10T10:34:00Z", "route": "BTC→ETH", "usdNotional": 3489.90, "feeUsd": 12.40, "status": "Completed", "txHash": "0x...", "chain": "THOR" }
+]
+
+
+The UI must consume these endpoints and render without any additional configuration.
+
+Interactions & UX
+
+Metric toggle (Fees/Volume) switches which series the chart displays and which KPI highlights.
+
+Range tabs (1D/7D/1M/3M/All) re-bucket series client-side (simple filter of mock data).
+
+Tooltips: show value (e.g., $42,589.43) and a tiny delta badge +3.53 in green for positive changes.
+
+KPIs: allow “hide/reveal” icon next to the big numbers (mask values).
+
+Empty states:
+
+Dashboard (no data): “We’re waiting for your first trades. Add your THOR/Maya/Chainflip IDs in Settings to start tracking.”
+
+Wallet (no BTC): “Add a Bitcoin address to receive monthly affiliate payouts.”
+
+Accessibility & Polish
+
+Focus states visible against dark background.
+
+Sufficient contrast for text and icons.
+
+Keyboard navigation for sidebar and tabs.
+
+Responsive: collapse sidebar to an icon rail ≤ 1024px; table scrolls horizontally if needed.
+
+Numbers use tabular-nums for clean alignment.
+
+Acceptance Criteria (what to verify)
+
+You can register (mock) → complete the 3-step onboarding → land on /dashboard.
+
+Dashboard shows: two big KPIs, chart with purple accent and gradient, metric + range toggles, Latest Transactions card with 4+ rows.
+
+Wallet saves and displays a Bitcoin address, masked by default; Copy and Reveal work.
+
+Settings updates Project basics and Tracking IDs; validation errors appear inline.
+
+Support shows a minimal help page.
+
+All content matches the look & layout of the attached screenshot (spacing, hierarchy, colors).
