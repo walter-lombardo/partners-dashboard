@@ -53,7 +53,7 @@ The project uses PostgreSQL with the following tables:
 - **metric_points** - Time-series metrics data
 - **transactions** - Transaction history
 
-See `shared/schema.ts` for full schema definitions.
+See `shared/schema.ts` for full schema definitions
 
 ---
 
